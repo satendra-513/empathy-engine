@@ -1,3 +1,4 @@
 flask
-pyttsx3
 textblob
+gtts
+gunicorn

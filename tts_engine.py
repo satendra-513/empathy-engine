@@ -1,26 +1,19 @@
-import pyttsx3
-
-engine = pyttsx3.init()
+from gtts import gTTS
+import os
 
 def speak(text, emotion):
     
-    # Emotion mapping (MUST be inside function)
+    # Emotion → speed mapping
     if emotion == "positive":
-        rate = 190
+        slow = False
     elif emotion == "negative":
-        rate = 110
+        slow = True
     else:
-        rate = 150
+        slow = False
 
-    engine.setProperty('rate', rate)
-    
-    # Voice selection
-    voices = engine.getProperty('voices')
-    engine.setProperty('voice', voices[0].id)
+    tts = gTTS(text=text, lang='en', slow=slow)
 
     file_path = f"outputs/output_{emotion}.mp3"
-    
-    engine.save_to_file(text, file_path)
-    engine.runAndWait()
-    
+    tts.save(file_path)
+
     return file_path
