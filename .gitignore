@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+outputs/
+*.wav
+*.mp3
+.vscode/
+a.exe
+.env

@@ -1,4 +1,4 @@
-flask
-textblob
-gtts
-gunicorn
+flask>=2.3
+vaderSentiment>=3.3.2
+pyttsx3>=2.90
+gunicorn>=21.2

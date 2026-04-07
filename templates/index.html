@@ -1,65 +1,423 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Empathy Engine</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="The Empathy Engine – AI-powered emotionally expressive text-to-speech synthesis"/>
+  <title>Empathy Engine 🎤</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    /* ── Design tokens ─────────────────────────────────────── */
+    :root {
+      --clr-bg:        #09090f;
+      --clr-surface:   #13131e;
+      --clr-card:      #1a1a2e;
+      --clr-border:    rgba(255,255,255,0.08);
+      --clr-accent:    #7c3aed;
+      --clr-accent2:   #06b6d4;
+      --clr-text:      #e2e8f0;
+      --clr-muted:     #64748b;
+      --radius:        16px;
+      --transition:    0.25s cubic-bezier(.4,0,.2,1);
+    }
 
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(to right, #1e3c72, #2a5298);
-            font-family: Arial, sans-serif;
-        }
+    /* ── Base ───────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        .container {
-            background: white;
-            padding: 30px 40px;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-            text-align: center;
-        }
+    body {
+      min-height: 100vh;
+      background: var(--clr-bg);
+      font-family: 'Inter', sans-serif;
+      color: var(--clr-text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem 4rem;
+      background-image:
+        radial-gradient(ellipse 80% 40% at 50% -10%, rgba(124,58,237,0.25) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 30% at 90% 80%, rgba(6,182,212,0.1) 0%, transparent 70%);
+    }
 
-        h2 {
-            margin-bottom: 20px;
-        }
+    /* ── Header ─────────────────────────────────────────────── */
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    .logo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      background: rgba(124,58,237,0.15);
+      border: 1px solid rgba(124,58,237,0.35);
+      border-radius: 999px;
+      padding: .35rem 1rem;
+      font-size: .8rem;
+      font-weight: 600;
+      letter-spacing: .06em;
+      color: #a78bfa;
+      margin-bottom: 1.2rem;
+      text-transform: uppercase;
+    }
+    h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 700;
+      background: linear-gradient(135deg, #a78bfa 0%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.15;
+    }
+    .subtitle {
+      color: var(--clr-muted);
+      margin-top: .6rem;
+      font-size: .95rem;
+    }
 
-        input {
-            padding: 10px;
-            width: 250px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            margin-right: 10px;
-        }
+    /* ── Card ────────────────────────────────────────────────── */
+    .card {
+      width: 100%;
+      max-width: 680px;
+      background: var(--clr-card);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
 
-        button {
-            padding: 10px 15px;
-            border: none;
-            background-color: #2a5298;
-            color: white;
-            border-radius: 6px;
-            cursor: pointer;
-        }
+    /* ── Form ────────────────────────────────────────────────── */
+    label.field-label {
+      display: block;
+      font-size: .8rem;
+      font-weight: 600;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--clr-muted);
+      margin-bottom: .5rem;
+    }
 
-        button:hover {
-            background-color: #1e3c72;
-        }
-    </style>
+    textarea {
+      width: 100%;
+      min-height: 140px;
+      resize: vertical;
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: 10px;
+      color: var(--clr-text);
+      font-family: 'Inter', sans-serif;
+      font-size: .97rem;
+      line-height: 1.6;
+      padding: 1rem;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      outline: none;
+    }
+    textarea:focus {
+      border-color: var(--clr-accent);
+      box-shadow: 0 0 0 3px rgba(124,58,237,0.2);
+    }
+
+    .char-count {
+      text-align: right;
+      font-size: .75rem;
+      color: var(--clr-muted);
+      margin-top: .3rem;
+    }
+
+    /* ── Button ──────────────────────────────────────────────── */
+    .btn {
+      width: 100%;
+      margin-top: 1.2rem;
+      padding: .9rem 1.5rem;
+      background: linear-gradient(135deg, #7c3aed, #06b6d4);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: opacity var(--transition), transform var(--transition);
+    }
+    .btn:hover        { opacity: .9; transform: translateY(-1px); }
+    .btn:active       { transform: translateY(0); }
+    .btn .btn-text    { display: flex; align-items: center; justify-content: center; gap: .5rem; }
+    .btn.loading .btn-text { visibility: hidden; }
+    .btn.loading::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      margin: auto;
+      width: 22px; height: 22px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Error ───────────────────────────────────────────────── */
+    .error-box {
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.35);
+      border-radius: 8px;
+      padding: .75rem 1rem;
+      color: #fca5a5;
+      font-size: .88rem;
+      margin-top: 1rem;
+    }
+
+    /* ── Result card ─────────────────────────────────────────── */
+    .result-card {
+      margin-top: 1.5rem;
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      animation: fadeUp .4s ease forwards;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+      flex-wrap: wrap;
+    }
+    .result-header h3 {
+      font-size: .8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--clr-muted);
+    }
+
+    /* Emotion badge */
+    .emotion-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      border-radius: 999px;
+      padding: .35rem .85rem;
+      font-weight: 600;
+      font-size: .88rem;
+      border: 1px solid;
+    }
+    .badge-excited     { background: rgba(251,191,36,.12); border-color: rgba(251,191,36,.4);  color: #fbbf24; }
+    .badge-positive    { background: rgba(34,197,94,.12);  border-color: rgba(34,197,94,.4);   color: #4ade80; }
+    .badge-neutral     { background: rgba(100,116,139,.12);border-color:rgba(100,116,139,.4);  color: #94a3b8; }
+    .badge-inquisitive { background: rgba(59,130,246,.12); border-color: rgba(59,130,246,.4);  color: #60a5fa; }
+    .badge-surprised   { background: rgba(234,179,8,.12);  border-color: rgba(234,179,8,.4);   color: #facc15; }
+    .badge-concerned   { background: rgba(249,115,22,.12); border-color: rgba(249,115,22,.4);  color: #fb923c; }
+    .badge-negative    { background: rgba(99,102,241,.12); border-color: rgba(99,102,241,.4);  color: #818cf8; }
+    .badge-frustrated  { background: rgba(239,68,68,.12);  border-color: rgba(239,68,68,.4);   color: #f87171; }
+
+    /* Intensity bar */
+    .intensity-row {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      margin-bottom: 1.2rem;
+    }
+    .intensity-label { font-size: .8rem; color: var(--clr-muted); min-width: 60px; }
+    .intensity-track {
+      flex: 1;
+      height: 6px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .intensity-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #7c3aed, #06b6d4);
+      border-radius: 99px;
+      transition: width .6s cubic-bezier(.4,0,.2,1);
+    }
+    .intensity-pct { font-size: .8rem; color: var(--clr-muted); min-width: 36px; text-align: right; }
+
+    /* Audio player wrapper */
+    .audio-wrap {
+      background: rgba(255,255,255,0.03);
+      border-radius: 10px;
+      padding: .9rem 1rem;
+      border: 1px solid var(--clr-border);
+    }
+    .audio-wrap p {
+      font-size: .78rem;
+      color: var(--clr-muted);
+      margin-bottom: .5rem;
+    }
+    audio { width: 100%; accent-color: var(--clr-accent); }
+
+    /* Quoted text */
+    .quoted-text {
+      font-size: .9rem;
+      color: var(--clr-muted);
+      font-style: italic;
+      line-height: 1.5;
+      border-left: 3px solid var(--clr-accent);
+      padding-left: .75rem;
+      margin-bottom: 1.2rem;
+    }
+
+    /* ── Emotion guide ───────────────────────────────────────── */
+    .guide {
+      width: 100%;
+      max-width: 680px;
+      margin-top: 2rem;
+    }
+    .guide h2 {
+      font-size: .8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--clr-muted);
+      margin-bottom: 1rem;
+    }
+    .guide-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
+      gap: .6rem;
+    }
+    .guide-item {
+      background: var(--clr-card);
+      border: 1px solid var(--clr-border);
+      border-radius: 10px;
+      padding: .7rem 1rem;
+      font-size: .82rem;
+    }
+    .guide-item strong { display: block; margin-bottom: .2rem; }
+    .guide-item span   { color: var(--clr-muted); line-height: 1.4; display: block; }
+
+    /* ── Footer ──────────────────────────────────────────────── */
+    footer {
+      margin-top: 3rem;
+      font-size: .78rem;
+      color: var(--clr-muted);
+      text-align: center;
+    }
+  </style>
 </head>
-
 <body>
 
-    <div class="container">
-        <h2>Empathy Engine 🎤</h2>
+  <!-- Header -->
+  <header>
+    <div class="logo-badge">🎤 AI Voice Synthesis</div>
+    <h1>The Empathy Engine</h1>
+    <p class="subtitle">Emotionally intelligent text-to-speech — 8 emotion categories with intensity scaling</p>
+  </header>
 
-        <form action="/generate_ui" method="post">
-            <input type="text" name="text" placeholder="Enter text..." required>
-            <button type="submit">Generate Voice</button>
-        </form>
+  <!-- Main card -->
+  <div class="card">
+
+    {% if error %}
+    <div class="error-box">⚠ {{ error }}</div>
+    {% endif %}
+
+    <form id="main-form" method="POST" action="/generate_ui">
+      <label class="field-label" for="text-input">Your text</label>
+      <textarea id="text-input" name="text" placeholder="e.g. This is the best news I've heard all year! or Why does this keep happening?" required>{{ text or '' }}</textarea>
+      <div class="char-count"><span id="char-count">0</span> characters</div>
+
+      <button class="btn" type="submit" id="submit-btn">
+        <span class="btn-text">✨ &nbsp;Synthesise Voice</span>
+      </button>
+    </form>
+
+    {% if emotion_result %}
+    <div class="result-card">
+      <div class="result-header">
+        <h3>Result</h3>
+        <span class="emotion-badge badge-{{ emotion_result.emotion }}">
+          {{ emotion_result.label }}
+        </span>
+      </div>
+
+      <div class="quoted-text">"{{ text }}"</div>
+
+      <div class="intensity-row">
+        <span class="intensity-label">Intensity</span>
+        <div class="intensity-track">
+          <div class="intensity-fill" style="width: {{ (emotion_result.intensity * 100)|round|int }}%"></div>
+        </div>
+        <span class="intensity-pct">{{ (emotion_result.intensity * 100)|round|int }}%</span>
+      </div>
+
+      <div class="audio-wrap">
+        <p>🔊 Generated audio — playback starts automatically</p>
+        <audio controls autoplay>
+          <source src="/outputs/{{ audio_file }}" type="audio/wav"/>
+          Your browser does not support audio playback.
+        </audio>
+      </div>
     </div>
+    {% endif %}
+
+  </div>
+
+  <!-- Emotion guide -->
+  <div class="guide">
+    <h2>Emotion → Voice Mapping</h2>
+    <div class="guide-grid">
+      <div class="guide-item">
+        <strong>😄 Excited</strong>
+        <span>Fast rate · High pitch · Full volume</span>
+      </div>
+      <div class="guide-item">
+        <strong>🙂 Positive</strong>
+        <span>Brisk rate · Raised pitch · Confident volume</span>
+      </div>
+      <div class="guide-item">
+        <strong>😲 Surprised</strong>
+        <span>Quickened rate · Elevated pitch · High volume</span>
+      </div>
+      <div class="guide-item">
+        <strong>🤔 Inquisitive</strong>
+        <span>Measured rate · Slightly raised pitch</span>
+      </div>
+      <div class="guide-item">
+        <strong>😐 Neutral</strong>
+        <span>Standard rate · Normal pitch · Moderate volume</span>
+      </div>
+      <div class="guide-item">
+        <strong>😟 Concerned</strong>
+        <span>Slow rate · Lowered pitch · Soft volume</span>
+      </div>
+      <div class="guide-item">
+        <strong>😢 Negative</strong>
+        <span>Slow rate · Low pitch · Quiet delivery</span>
+      </div>
+      <div class="guide-item">
+        <strong>😤 Frustrated</strong>
+        <span>Very slow rate · Lowest pitch · Reduced volume</span>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    The Empathy Engine · Built with Flask + VADER + pyttsx3
+  </footer>
+
+  <script>
+    // Character counter
+    const ta   = document.getElementById('text-input');
+    const cnt  = document.getElementById('char-count');
+    const update = () => cnt.textContent = ta.value.length;
+    ta.addEventListener('input', update);
+    update();
+
+    // Loading state on submit
+    document.getElementById('main-form').addEventListener('submit', () => {
+      const btn = document.getElementById('submit-btn');
+      btn.classList.add('loading');
+      btn.disabled = true;
+    });
+  </script>
 
 </body>
 </html>
