@@ -7,6 +7,8 @@ Falls back gracefully if pyttsx3 is unavailable.
 import os
 import time
 import pyttsx3
+from gtts import gTTS
+
 
 # ─── Emotion → Voice Parameter Map ───────────────────────────────────────────
 # Each entry defines BASE values; intensity will scale them.
@@ -75,18 +77,31 @@ def speak(text: str, emotion_result: dict) -> str:
     timestamp = int(time.time())
     wav_path  = os.path.abspath(f"outputs/output_{emotion}_{timestamp}.wav")
 
-    engine = pyttsx3.init()
-    engine.setProperty("rate",   params["rate"])
-    engine.setProperty("volume", params["volume"])
-
-    # Pitch is SAPI5 (Windows) / festival-specific – set if supported
     try:
-        engine.setProperty("pitch", params["pitch"])
-    except Exception:
-        pass  # Not all backends support pitch
+        engine = pyttsx3.init()
+        engine.setProperty("rate",   params["rate"])
+        engine.setProperty("volume", params["volume"])
 
-    engine.save_to_file(text, wav_path)
-    engine.runAndWait()
-    engine.stop()
+        # Pitch is SAPI5 (Windows) / festival-specific – set if supported
+        try:
+            engine.setProperty("pitch", params["pitch"])
+        except Exception:
+            pass  # Not all backends support pitch
+
+        engine.save_to_file(text, wav_path)
+        engine.runAndWait()
+        engine.stop()
+    except Exception as e:
+        # Fallback to gTTS if pyttsx3 fails (e.g. on Render without espeak)
+        print(f"Fallback to gTTS due to pyttsx3 error: {e}")
+        
+        # gTTS only supports 'slow' parameter. 
+        # We'll use 'slow' for negative/concerned/frustrated emotions with high intensity.
+        is_slow = emotion in ["negative", "concerned", "frustrated"] and intensity > 0.4
+        
+        tts = gTTS(text=text, lang='en', slow=is_slow)
+        tts.save(wav_path)
+
+    return wav_path
 
     return wav_path
