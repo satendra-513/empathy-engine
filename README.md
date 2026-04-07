@@ -1,5 +1,8 @@
 # 🎤 The Empathy Engine
 
+**Live Demo**: [https://empathy-engine-dqb8.onrender.com/](https://empathy-engine-dqb8.onrender.com/)  
+**GitHub Repo**: [https://github.com/satendra-513/empathy-engine](https://github.com/satendra-513/empathy-engine)
+
 > An AI-powered service that synthesises **emotionally expressive speech** from plain text — dynamically modulating vocal characteristics based on detected emotion and intensity.
 
 ---
